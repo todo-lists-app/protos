@@ -1,0 +1,20 @@
+syntax = "proto3";
+package key.v1;
+option go_package = "github.com/todo-lists-app/protos/go/key/v1";
+
+message KeyResponse {
+  string public_key = 1;
+  string private_key = 2;
+
+  string status = 99;
+}
+
+message KeyRequest {
+  string user_id = 1;
+  string decode_key = 2;
+}
+
+service KeyService {
+  rpc GetKey(KeyRequest) returns (KeyResponse);
+  rpc CreateKey(KeyRequest) returns (KeyResponse);
+}
