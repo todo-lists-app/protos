@@ -17,4 +17,5 @@ message KeyRequest {
 service KeyService {
   rpc GetKey(KeyRequest) returns (KeyResponse);
   rpc CreateKey(KeyRequest) returns (KeyResponse);
+  rpc DeleteKey(KeyRequest) returns (KeyResponse);
 }

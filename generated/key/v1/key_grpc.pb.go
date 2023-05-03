@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type KeyServiceClient interface {
 	GetKey(ctx context.Context, in *KeyRequest, opts ...grpc.CallOption) (*KeyResponse, error)
 	CreateKey(ctx context.Context, in *KeyRequest, opts ...grpc.CallOption) (*KeyResponse, error)
+	DeleteKey(ctx context.Context, in *KeyRequest, opts ...grpc.CallOption) (*KeyResponse, error)
 }
 
 type keyServiceClient struct {
@@ -52,12 +53,22 @@ func (c *keyServiceClient) CreateKey(ctx context.Context, in *KeyRequest, opts .
 	return out, nil
 }
 
+func (c *keyServiceClient) DeleteKey(ctx context.Context, in *KeyRequest, opts ...grpc.CallOption) (*KeyResponse, error) {
+	out := new(KeyResponse)
+	err := c.cc.Invoke(ctx, "/key.v1.KeyService/DeleteKey", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KeyServiceServer is the server API for KeyService service.
 // All implementations must embed UnimplementedKeyServiceServer
 // for forward compatibility
 type KeyServiceServer interface {
 	GetKey(context.Context, *KeyRequest) (*KeyResponse, error)
 	CreateKey(context.Context, *KeyRequest) (*KeyResponse, error)
+	DeleteKey(context.Context, *KeyRequest) (*KeyResponse, error)
 	mustEmbedUnimplementedKeyServiceServer()
 }
 
@@ -70,6 +81,9 @@ func (UnimplementedKeyServiceServer) GetKey(context.Context, *KeyRequest) (*KeyR
 }
 func (UnimplementedKeyServiceServer) CreateKey(context.Context, *KeyRequest) (*KeyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateKey not implemented")
+}
+func (UnimplementedKeyServiceServer) DeleteKey(context.Context, *KeyRequest) (*KeyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteKey not implemented")
 }
 func (UnimplementedKeyServiceServer) mustEmbedUnimplementedKeyServiceServer() {}
 
@@ -120,6 +134,24 @@ func _KeyService_CreateKey_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _KeyService_DeleteKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(KeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KeyServiceServer).DeleteKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/key.v1.KeyService/DeleteKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KeyServiceServer).DeleteKey(ctx, req.(*KeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // KeyService_ServiceDesc is the grpc.ServiceDesc for KeyService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +166,10 @@ var KeyService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateKey",
 			Handler:    _KeyService_CreateKey_Handler,
+		},
+		{
+			MethodName: "DeleteKey",
+			Handler:    _KeyService_DeleteKey_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
